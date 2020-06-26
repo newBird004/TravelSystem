@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.yy.dao.OrderItemCustomMapper" >
+  <resultMap id="BaseResultMap" type="cn.yy.vo.OrderItemCustom" >
+    <id column="orderItemId" property="orderItemId" jdbcType="INTEGER" />
+    <result column="orderId_FK_OrderItem" property="orderId_FK_OrderItem" jdbcType="INTEGER" />
+    <result column="realNameId_FK_OrderItem" property="realNameId_FK_OrderItem" jdbcType="INTEGER" />
+    <result column="scenicId_FK_OrderItem" property="scenicId_FK_OrderItem" jdbcType="INTEGER" />
+    <result column="roomId_FK_OrderItem" property="roomId_FK_OrderItem" jdbcType="INTEGER" />
+    <result column="taoCanId_FK_OrderItem" property="taoCanId_FK_OrderItem" jdbcType="INTEGER" />
+    <result column="commentId_FK_OrderItem" property="commentId_FK_OrderItem" jdbcType="INTEGER" />
+    <result column="orderItemPrice" property="orderItemPrice" jdbcType="INTEGER" />
+    <result column="orderItemStartDate" property="orderItemStartDate" jdbcType="VARCHAR" />
+    <result column="orderItemEndDate" property="orderItemEndDate" jdbcType="VARCHAR" />
+    <result column="orderItemPayStatus" property="orderItemPayStatus" jdbcType="INTEGER" />
+    <result column="orderItemCreateDate" property="orderItemCreateDate" jdbcType="VARCHAR" />
+    <result column="roomTimeId_FK_OrderItem" property="roomTimeId_FK_OrderItem" jdbcType="INTEGER" />
+
+    <result column="scenicName" property="scenicName" jdbcType="VARCHAR" />
+    <result column="hotelName" property="hotelName" jdbcType="VARCHAR" />
+    <result column="roomType" property="roomType" jdbcType="VARCHAR" />
+    <result column="taoCanName" property="taoCanName" jdbcType="VARCHAR" />
+    <result column="realName" property="realName" jdbcType="VARCHAR" />
+  </resultMap>
+
+
+  <select id="selectOrderItemDetail" resultMap="BaseResultMap" parameterType="int" >
+    SELECT b.*,
+           c.scenicName as scenicName,
+           d.roomType as roomType,
+           e.hotelName as hotelName,
+           f.taoCanName as taoCanName,
+           g.realName as realName from orders as a
+                                         left JOIN order_item as b on a.orderId=b.orderId_FK_OrderItem
+                                         left JOIN scenic as c on b.scenicId_FK_OrderItem=c.scenicId
+                                         left join room as d on b.roomId_FK_OrderItem=d.roomId
+                                         left join hotel as e on d.hotelId_FK_Room=e.hotelId
+                                         left join tao_can as f on b.taoCanId_FK_OrderItem=f.taoCanId
+                                         left join real_name as g on b.realNameId_FK_OrderItem=g.realNameId
+        where a.orderId=#{orderId};
+  </select>
+
+</mapper>

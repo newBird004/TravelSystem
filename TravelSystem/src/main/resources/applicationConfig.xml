@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 读取数据库配置文件 -->
+    <context:property-placeholder location="classpath:db.properties"/>
+
+    <!-- 创建连接池 -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="username" value="${jdbc.user}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+        <property name="maxActive" value="10"></property>
+        <property name="maxIdle" value="5"></property>
+    </bean>
+
+    <!-- 开启组件扫描 -->
+    <context:component-scan base-package="cn.yy.pojo"></context:component-scan>
+    <context:component-scan base-package="cn.yy.dao"></context:component-scan>
+    <context:component-scan base-package="cn.yy.service.impl"></context:component-scan>
+
+
+    <!-- 创建SqlSessionFactory对象 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 关联连接池 -->
+        <property name="dataSource" ref="dataSource"></property>
+        <!-- 加载sql映射文件 -->
+        <property name="mapperLocations" value="classpath*:cn/yy/mapper/**/*.xml"></property>
+        <!-- 引入插件 -->
+        <property name="plugins">
+            <array>
+                <!-- mybatis分页插件 -->
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <property name="properties">
+                        <!-- 连接数据库的类型 -->
+                        <value>
+                            helperDialect=mysql
+                        </value>
+
+                    </property>
+                </bean>
+            </array>
+        </property>
+    </bean>
+
+    <!-- 扫描接口的方式实现mapper接口实现的扫描 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 填写要扫描哪个包,将mapper接口的实现类添加到spring容器 -->
+        <property name="basePackage" value="cn.yy.dao"></property>
+    </bean>
+
+    <!-- 开启事务管理 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!-- 启用spring事务注解 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+</beans>
+
